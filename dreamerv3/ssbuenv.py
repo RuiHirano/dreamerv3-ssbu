@@ -4,6 +4,7 @@ import gym
 import time
 import threading
 import cv2
+import random
 
 class EnvAction(Enum):
     NONE = {"name": "NONE", "input": {"buttons": [], "main_stick": (0, 0), "c_stick": (0, 0), "hold": False}}
@@ -43,6 +44,7 @@ class UltimateEnv(gym.Env):
         self.fps = fps
         self.image_size = image_size
         self.client = UltimateClient(server_url)
+        self.client.add_controller(0)
         self.gamestate = None
         self.prev_gamestate = None
         self.dead = {0: False, 1: False}
@@ -79,8 +81,8 @@ class UltimateEnv(gym.Env):
     def _gamestate_to_observation(self, gamestate):
         return gamestate.image
 
-    def reset(self, without_reset=False):
-        if not without_reset:
+    def reset(self, disable_reset=False):
+        if not disable_reset:
             self.client.input(0, [Button.L, Button.R, Button.A])
         observation = self._gamestate_to_observation(self.gamestate)
         self.client.input(0)
@@ -126,16 +128,13 @@ class UltimateEnv(gym.Env):
 
 if __name__ == "__main__":
     with UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84)) as env:
-        episode = 10
+        episode = 1000
         for i in range(episode):
             print("episode: ", i)
-            env.reset()
+            env.reset(disable_reset=True)
             done = False
-            actions = [EnvAction.JUMP_R, EnvAction.DASH_R, EnvAction.DASH_R, EnvAction.DASH_R]
-            i=0
             while not done:
                 env.render()
-                action = actions[i % len(actions)]
-                observation, reward, done, info = env.step(EnvAction.JAB)
+                random_action = random.choice(list(EnvAction))
+                observation, reward, done, info = env.step(random_action)
                 print(done, reward)
-                i+=1

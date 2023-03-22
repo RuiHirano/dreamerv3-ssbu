@@ -38,13 +38,14 @@ class EnvAction(Enum):
     GRAB = {"name": "GRAB", "input": {"buttons": [Button.L], "main_stick": (0, 0), "c_stick": (0, 0), "hold": False}}
 
 class UltimateEnv(gym.Env):
-    def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256)):
+    def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256), obs_key='image'):
         super().__init__()
         self.action_space = gym.spaces.Discrete(len(EnvAction))
         self.fps = fps
         self.image_size = image_size
         self.client = UltimateClient(server_url)
         self.client.add_controller(0)
+        self.obs_key = obs_key # 'image' or 'vector'
         self.gamestate = None
         self.prev_gamestate = None
         self.dead = {0: False, 1: False}
@@ -66,7 +67,7 @@ class UltimateEnv(gym.Env):
         time.sleep(1)
 
     def _stream_gamestate(self):
-        for gamestate in self.client.stream(fps=self.fps*2, include_image=True, image_size=self.image_size):
+        for gamestate in self.client.stream(fps=self.fps*2, include_image=self.obs_key=='image', image_size=self.image_size):
             self.prev_gamestate = self.gamestate
             self.gamestate = gamestate
             if self.gamestate.players[0].fighter_status_kind != 470 and self.prev_gamestate and self.prev_gamestate.players[0].fighter_status_kind == 470:

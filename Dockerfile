@@ -14,7 +14,11 @@ RUN apt-get update && apt-get -y install \
 # libgl1-mesa-dev for opencv
 # cmake libz-dev for gym[atari]
 
-WORKDIR /app
+# install libultimate
+RUN git clone https://github.com/DeepSmashProject/libultimate.git && \
+    cd libultimate && pip install -e .
+
+WORKDIR /dreamerv3-ssbu
 COPY requirements.txt .
 RUN pip --no-cache-dir install -r requirements.txt
 

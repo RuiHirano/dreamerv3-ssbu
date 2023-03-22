@@ -32,9 +32,9 @@ def main():
       # embodied.logger.MLFlowOutput(logdir.name),
   ])
 
-  import crafter
+  from .ssbuenv import UltimateEnv
   from embodied.envs import from_gym
-  env = crafter.Env()  # Replace this with your Gym env.
+  env = UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84))  # Replace this with your Gym env.
   env = from_gym.FromGym(env, obs_key='image')  # Or obs_key='vector'.
   env = dreamerv3.wrap_env(env, config)
   env = embodied.BatchEnv([env], parallel=False)

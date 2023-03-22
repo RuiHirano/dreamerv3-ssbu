@@ -128,3 +128,23 @@ environments.
 [website]: https://danijar.com/dreamerv3
 [tweet]: https://twitter.com/danijarh/status/1613161946223677441
 [example]: https://github.com/danijar/dreamerv3/blob/main/example.py
+
+
+## RuntimeError: Unknown backend: 'gpu' requested Error
+https://github.com/danijar/dreamerv3/issues/5
+pip install jaxlib==0.3.25+cuda11.cudnn82 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+pip install jax==0.3.25
+## UNIMPLEMENTED: DNN library is not found Error
+pip install tensorflow==2.8
+apt-cache policy libcudnn8
+apt install --allow-change-held-packages libcudnn8=8.4.1.50-1+cuda11.6
+
+python dreamerv3/train.py --logdir /app/logdir/$(date "+%Y%m%d-%H%M%S") --configs atari --batch_size 16 --run.train_ratio 32
+
+$ docker run --rm -it -v /home/ruirui_nis/workspace/dreamerv3/logdir:/app/logdir dreamerv3:latest
+
+コンテナに入った後に
+pip install jaxlib==0.3.25+cuda11.cudnn82 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+pip install gym[atari]
+apt-cache policy libcudnn8
+apt update && apt install --allow-change-held-packages libcudnn8=8.4.1.50-1+cuda11.6

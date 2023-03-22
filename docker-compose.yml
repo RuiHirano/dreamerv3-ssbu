@@ -1,0 +1,12 @@
+version: '3.5'
+services:
+  dreamerv3-ssbu:
+    image: dreamerv3-ssbu:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dreamerv3-ssbu
+    ports:
+      - 8008:8008 # port for api
+    volumes:
+      - ./logdir:/root/logdir

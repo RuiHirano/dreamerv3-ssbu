@@ -15,8 +15,7 @@ RUN apt-get update && apt-get -y install \
 # cmake libz-dev for gym[atari]
 
 # install libultimate
-RUN git clone https://github.com/DeepSmashProject/libultimate.git && \
-    cd libultimate && pip install -e .
+RUN pip install git+https://github.com/DeepSmashProject/libultimate.git@1.2.1
 
 WORKDIR /dreamerv3-ssbu
 COPY requirements.txt .

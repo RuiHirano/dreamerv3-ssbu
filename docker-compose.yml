@@ -10,6 +10,6 @@ services:
     ports:
       - 8008:8008 # port for api
     environment:
-      - SERVER_ADDRESS=http://192.168.207.236:8008
+      - SERVER_ADDRESS=http://xxx.xxx.xxx.xxx:8008
     volumes:
       - ./logdir:/root/logdir

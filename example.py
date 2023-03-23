@@ -32,21 +32,22 @@ def main():
       # embodied.logger.MLFlowOutput(logdir.name),
   ])
 
-  from .ssbuenv import UltimateEnv
+  from ssbuenv import UltimateEnv
   from embodied.envs import from_gym
-  env = UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84))  # Replace this with your Gym env.
-  env = from_gym.FromGym(env, obs_key='image')  # Or obs_key='vector'.
-  env = dreamerv3.wrap_env(env, config)
-  env = embodied.BatchEnv([env], parallel=False)
+  import os
+  with UltimateEnv(server_url=os.getenv("SERVER_ADDRESS"), fps=10, image_size=(64, 64)) as env:  # Replace this with your Gym env.
+    env = from_gym.FromGym(env, obs_key='image')  # Or obs_key='vector'.
+    env = dreamerv3.wrap_env(env, config)
+    env = embodied.BatchEnv([env], parallel=False)
 
-  agent = dreamerv3.Agent(env.obs_space, env.act_space, step, config)
-  replay = embodied.replay.Uniform(
-      config.batch_length, config.replay_size, logdir / 'replay')
-  args = embodied.Config(
-      **config.run, logdir=config.logdir,
-      batch_steps=config.batch_size * config.batch_length)
-  embodied.run.train(agent, env, replay, logger, args)
-  # embodied.run.eval_only(agent, env, logger, args)
+    agent = dreamerv3.Agent(env.obs_space, env.act_space, step, config)
+    replay = embodied.replay.Uniform(
+        config.batch_length, config.replay_size, logdir / 'replay')
+    args = embodied.Config(
+        **config.run, logdir=config.logdir,
+        batch_steps=config.batch_size * config.batch_length)
+    embodied.run.train(agent, env, replay, logger, args)
+    # embodied.run.eval_only(agent, env, logger, args)
 
 
 if __name__ == '__main__':

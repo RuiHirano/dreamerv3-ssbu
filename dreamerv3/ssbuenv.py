@@ -5,6 +5,7 @@ import time
 import threading
 import cv2
 import random
+import numpy as np
 
 class EnvAction(Enum):
     NONE = {"name": "NONE", "input": {"buttons": [], "main_stick": (0, 0), "c_stick": (0, 0), "hold": False}}
@@ -36,11 +37,16 @@ class EnvAction(Enum):
     DASH_R = {"name": "DASH_R", "input": {"buttons": [], "main_stick": (1, 0), "c_stick": (0, 0), "hold": True}}
     GUARD = {"name": "GUARD", "input": {"buttons": [Button.ZR], "main_stick": (0, 0), "c_stick": (0, 0), "hold": True}}
     GRAB = {"name": "GRAB", "input": {"buttons": [Button.L], "main_stick": (0, 0), "c_stick": (0, 0), "hold": False}}
+    
+    @classmethod
+    def get_names(cls) -> list:
+        return [i.name for i in cls]
 
 class UltimateEnv(gym.Env):
     def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256), obs_key='image'):
         super().__init__()
         self.action_space = gym.spaces.Discrete(len(EnvAction))
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(image_size[1], image_size[0], 3), dtype=np.uint8)
         self.fps = fps
         self.image_size = image_size
         self.client = UltimateClient(server_url)
@@ -93,13 +99,13 @@ class UltimateEnv(gym.Env):
         self.done = False
         return observation
 
-    def step(self, action):
-        input = action.value["input"]
+    def step(self, action_num: int):
+        input = EnvAction[EnvAction.get_names()[action_num]].value["input"]
         self.client.input(0, input["buttons"], input["main_stick"], input["c_stick"], input["hold"])
         interval = 1/self.fps
         time.sleep(interval)
         observation = self._gamestate_to_observation(self.gamestate)
-        info = self.gamestate
+        info = {"state": self.gamestate}
         self.prev_gamestate = self.gamestate
         reward = self.reward
         self.reward = 0
@@ -136,6 +142,6 @@ if __name__ == "__main__":
             done = False
             while not done:
                 env.render()
-                random_action = random.choice(list(EnvAction))
-                observation, reward, done, info = env.step(random_action)
+                random_action_num = np.random.randint(0, len(EnvAction))
+                observation, reward, done, info = env.step(random_action_num)
                 print(done, reward)

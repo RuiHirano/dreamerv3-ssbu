@@ -18,7 +18,9 @@ class EnvAction(Enum):
     SMASH_L = {"name": "SMASH_L", "input": {"buttons": [Button.A], "main_stick": (-1, 0), "c_stick": (0, 0), "hold": False}}
     SMASH_D = {"name": "SMASH_D", "input": {"buttons": [Button.A], "main_stick": (0, -1), "c_stick": (0, 0), "hold": False}}
     SMASH_R = {"name": "SMASH_R", "input": {"buttons": [Button.A], "main_stick": (1, 0), "c_stick": (0, 0), "hold": False}}
-    SPECIAL_U = {"name": "SPECIAL_U", "input": {"buttons": [Button.B], "main_stick": (0, 1), "c_stick": (0, 0), "hold": False}}
+    SPECIAL_N = {"name": "SPECIAL_N", "input": {"buttons": [Button.B], "main_stick": (0, 0), "c_stick": (0, 0), "hold": False}}
+    SPECIAL_UL = {"name": "SPECIAL_UL", "input": {"buttons": [Button.B], "main_stick": (-1, 1), "c_stick": (0, 0), "hold": True}}
+    SPECIAL_UR = {"name": "SPECIAL_UR", "input": {"buttons": [Button.B], "main_stick": (1, 1), "c_stick": (0, 0), "hold": True}}
     SPECIAL_L = {"name": "SPECIAL_L", "input": {"buttons": [Button.B], "main_stick": (-1, 0), "c_stick": (0, 0), "hold": False}}
     SPECIAL_D = {"name": "SPECIAL_D", "input": {"buttons": [Button.B], "main_stick": (0, -1), "c_stick": (0, 0), "hold": False}}
     SPECIAL_R = {"name": "SPECIAL_R", "input": {"buttons": [Button.B], "main_stick": (1, 0), "c_stick": (0, 0), "hold": False}}

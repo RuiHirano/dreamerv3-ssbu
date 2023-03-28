@@ -1,3 +1,33 @@
+# Getting Started
+
+edit docker-compose.yaml
+```
+environment:
+  - SERVER_ADDRESS=http://xxx.xxx.xxx.xxx:8008 
+```
+
+
+```
+make build
+make run
+make exec
+```
+
+```
+pip install jaxlib==0.3.25+cuda11.cudnn82 -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+pip install jax==0.3.25
+```
+for below error.
+```
+RuntimeError: Unknown backend: 'gpu' requested, but no platforms that 
+are instances of gpu are present. Platforms present are: 
+interpreter,cpu
+```
+
+```
+python3 example.py
+```
+
 # Mastering Diverse Domains through World Models
 
 A reimplementation of [DreamerV3][paper], a scalable and general reinforcement

@@ -6,10 +6,17 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: dreamerv3-ssbu
+    runtime: nvidia
     tty: true
-    ports:
-      - 8008:8008 # port for api
     environment:
-      - SERVER_ADDRESS=http://xxx.xxx.xxx.xxx:8008
+      - SERVER_ADDRESS=${SERVER_ADDRESS}
     volumes:
-      - ./logdir:/root/logdir
+      - ${LOG_DIR}:/root/logdir
+  tensorboard:
+    image: tensorflow/tensorflow:latest
+    container_name: dreamerv3-tensorboard
+    ports:
+      - ${TENSORBOARD_PORT}:6006
+    volumes:
+      - ${LOG_DIR}:/root/logdir
+    command: tensorboard --logdir /root/logdir --bind_all

@@ -45,12 +45,13 @@ class EnvAction(Enum):
         return [i.name for i in cls]
 
 class UltimateEnv(gym.Env):
-    def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256), obs_key='image'):
+    def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256), disable_percent_reset=False, obs_key='image'):
         super().__init__()
         self.action_space = gym.spaces.Discrete(len(EnvAction))
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=(image_size[1], image_size[0], 3), dtype=np.uint8)
         self.fps = fps
         self.image_size = image_size
+        self.disable_percent_reset = disable_percent_reset
         self.client = UltimateClient(server_url)
         self.client.add_controller(0)
         self.obs_key = obs_key # 'image' or 'vector'
@@ -90,8 +91,8 @@ class UltimateEnv(gym.Env):
     def _gamestate_to_observation(self, gamestate):
         return gamestate.image
 
-    def reset(self, disable_reset=False):
-        if not disable_reset:
+    def reset(self):
+        if not self.disable_percent_reset:
             self.client.input(0, [Button.L, Button.R, Button.A])
         observation = self._gamestate_to_observation(self.gamestate)
         self.client.input(0)
@@ -136,11 +137,11 @@ class UltimateEnv(gym.Env):
         return reward
 
 if __name__ == "__main__":
-    with UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84)) as env:
+    with UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84), disable_percent_reset=False) as env:
         episode = 1000
         for i in range(episode):
             print("episode: ", i)
-            env.reset(disable_reset=True)
+            env.reset()
             done = False
             while not done:
                 env.render()

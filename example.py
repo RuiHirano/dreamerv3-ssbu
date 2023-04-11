@@ -15,8 +15,8 @@ def main():
       'run.log_every': 30,  # Seconds
       'batch_size': 16,
       'jax.prealloc': False,
-      'encoder.mlp_keys': '$^',
-      'decoder.mlp_keys': '$^',
+      'encoder.mlp_keys': 'vector',
+      'decoder.mlp_keys': 'vector',
       'encoder.cnn_keys': 'image',
       'decoder.cnn_keys': 'image',
       # 'jax.platform': 'cpu',

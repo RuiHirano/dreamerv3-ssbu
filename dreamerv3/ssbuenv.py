@@ -48,7 +48,7 @@ class UltimateEnv(gym.Env):
     def __init__(self, server_url="http://localhost:8008", fps=10, image_size=(256, 256), disable_percent_reset=False, obs_key='image'):
         super().__init__()
         self.action_space = gym.spaces.Discrete(len(EnvAction))
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(image_size[1], image_size[0], 3), dtype=np.uint8)
+        self.observation_space = gym.spaces.Box(low=0, high=255, shape=(image_size[1], image_size[0], 3), dtype=np.uint8) if obs_key == 'image' else gym.spaces.Box(low=-2, high=2, shape=(68*2,), dtype=np.float)
         self.fps = fps
         self.image_size = image_size
         self.disable_percent_reset = disable_percent_reset
@@ -162,7 +162,7 @@ class UltimateEnv(gym.Env):
 
     def _gamestate_to_observation(self, gamestate):
         if self.obs_key == "vector":
-            return np.array([
+            return np.concatenate([
                 self._convert_player_state_to_vector(gamestate.players[0]),
                 self._convert_player_state_to_vector(gamestate.players[1]),
             ])
@@ -217,7 +217,7 @@ class UltimateEnv(gym.Env):
         return reward
 
 if __name__ == "__main__":
-    with UltimateEnv(server_url="http://localhost:8008", fps=10, obs_key="vector", image_size=(84, 84), disable_percent_reset=False) as env:
+    with UltimateEnv(server_url="http://localhost:80", fps=10, obs_key="vector", image_size=(84, 84), disable_percent_reset=False) as env:
         episode = 1000
         for i in range(episode):
             print("episode: ", i)

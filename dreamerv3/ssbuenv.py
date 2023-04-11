@@ -87,8 +87,85 @@ class UltimateEnv(gym.Env):
             self.reward = self._reward(self.reward, self.done, self.gamestate, self.prev_gamestate)
             if self.stop_event.is_set():
                 break
+            
+    def _convert_player_state_to_vector(self, player_state):
+        return [
+            player_state.position.x/242,
+            player_state.position.y/146,
+            player_state.lr,
+            player_state.percent/150,
+            player_state.speed.x/2.5,
+            player_state.speed.y/2.5,
+            player_state.controller_state.stick_x,
+            player_state.controller_state.stick_y,
+            int(player_state.situation_kind == 0), # on_ground
+            int(player_state.situation_kind == 1), # on_cliff
+            int(player_state.situation_kind == 2), # on_air
+            int(player_state.fighter_status_kind == 0), # wait
+            int(player_state.fighter_status_kind == 1), # walk
+            int(player_state.fighter_status_kind == 3), # dash_start
+            int(player_state.fighter_status_kind == 4), # dash
+            int(player_state.fighter_status_kind == 5), # dash_end
+            int(player_state.fighter_status_kind == 7), # turn
+            int(player_state.fighter_status_kind == 8), # turn_dash
+            int(player_state.fighter_status_kind == 11), # jump
+            int(player_state.fighter_status_kind == 12), # jump_aer
+            int(player_state.fighter_status_kind == 16), # cannot_action
+            int(player_state.fighter_status_kind == 18), # crouch
+            int(player_state.fighter_status_kind == 22), # landing
+            int(player_state.fighter_status_kind == 23), # landing_short
+            int(player_state.fighter_status_kind == 27), # guard_start
+            int(player_state.fighter_status_kind == 28), # guard
+            int(player_state.fighter_status_kind == 29), # guard_end
+            int(player_state.fighter_status_kind == 31), # escape_neutral
+            int(player_state.fighter_status_kind == 32), # escape_foward
+            int(player_state.fighter_status_kind == 33), # escape_back
+            int(player_state.fighter_status_kind == 34), # escape_air
+            int(player_state.fighter_status_kind == 39), # attack_neutral
+            int(player_state.fighter_status_kind == 41), # attack_dash
+            int(player_state.fighter_status_kind == 42), # attack_side
+            int(player_state.fighter_status_kind == 43), # attack_up
+            int(player_state.fighter_status_kind == 44), # attack_down
+            int(player_state.fighter_status_kind == 46), # smash_side_keep
+            int(player_state.fighter_status_kind == 47), # smash_side
+            int(player_state.fighter_status_kind == 49), # smash_down_keep
+            int(player_state.fighter_status_kind == 50), # smash_down
+            int(player_state.fighter_status_kind == 52), # smash_up_keep
+            int(player_state.fighter_status_kind == 53), # smash_up
+            int(player_state.fighter_status_kind == 54), # attack_air
+            int(player_state.fighter_status_kind == 55), # grab
+            int(player_state.fighter_status_kind == 60), # grab_wait
+            int(player_state.fighter_status_kind == 61), # grab_attack
+            int(player_state.fighter_status_kind == 62), # grab_cut
+            int(player_state.fighter_status_kind == 64), # grab_throw
+            int(player_state.fighter_status_kind == 66), # grabbed
+            int(player_state.fighter_status_kind == 67), # grabbed_attack
+            int(player_state.fighter_status_kind == 68), # grabbed_cut
+            int(player_state.fighter_status_kind == 70), # grabbed_throw
+            int(player_state.fighter_status_kind == 71), # damaged_not_fly
+            int(player_state.fighter_status_kind == 72), # damaged_standing_fly
+            int(player_state.fighter_status_kind == 73), # damaged_fall_fly
+            int(player_state.fighter_status_kind == 80), # damaged_down_start
+            int(player_state.fighter_status_kind == 83), # damaged_down
+            int(player_state.fighter_status_kind == 87), # damaged_down_getup
+            int(player_state.fighter_status_kind == 119), # cliff_catch
+            int(player_state.fighter_status_kind == 120), # cliff_attack
+            int(player_state.fighter_status_kind == 121), # cliff_climb
+            int(player_state.fighter_status_kind == 122), # cliff_escape
+            int(player_state.fighter_status_kind == 124), # cliff_jump
+            int(player_state.fighter_status_kind == 127), # cliff_stegger
+            int(player_state.fighter_status_kind == 476), # special_neutral
+            int(player_state.fighter_status_kind == 477), # special_side
+            int(player_state.fighter_status_kind == 478), # special_up
+            int(player_state.fighter_status_kind == 481), # special_down
+        ]
 
     def _gamestate_to_observation(self, gamestate):
+        if self.obs_key == "vector":
+            return np.array([
+                self._convert_player_state_to_vector(gamestate.players[0]),
+                self._convert_player_state_to_vector(gamestate.players[1]),
+            ])
         return gamestate.image
 
     def reset(self):
@@ -115,10 +192,13 @@ class UltimateEnv(gym.Env):
         return observation, reward, self.done, info
 
     def render(self, mode='human', close=False):
-        cv2.imshow('camera' , self.gamestate.image)
-        key =cv2.waitKey(10)
-        if key == 27:
-            raise KeyboardInterrupt
+        if self.obs_key == "image":
+            cv2.imshow('camera' , self.gamestate.image)
+            key =cv2.waitKey(10)
+            if key == 27:
+                raise KeyboardInterrupt
+        elif self.obs_key == "vector":
+            print(self.gamestate)
 
     def _done(self):
         return self.dead[0] or self.dead[1]
@@ -137,14 +217,14 @@ class UltimateEnv(gym.Env):
         return reward
 
 if __name__ == "__main__":
-    with UltimateEnv(server_url="http://localhost:8008", fps=10, image_size=(84, 84), disable_percent_reset=False) as env:
+    with UltimateEnv(server_url="http://35.77.44.214:8008", fps=10, obs_key="vector", image_size=(84, 84), disable_percent_reset=False) as env:
         episode = 1000
         for i in range(episode):
             print("episode: ", i)
             env.reset()
             done = False
             while not done:
-                env.render()
+                #env.render()
                 random_action_num = np.random.randint(0, len(EnvAction))
                 observation, reward, done, info = env.step(random_action_num)
                 print(done, reward)

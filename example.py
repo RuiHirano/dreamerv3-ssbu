@@ -3,13 +3,14 @@ def main():
   import warnings
   import dreamerv3
   from dreamerv3 import embodied
+  from datetime import datetime
   warnings.filterwarnings('ignore', '.*truncated to dtype int32.*')
 
   # See configs.yaml for all options.
   config = embodied.Config(dreamerv3.configs['defaults'])
-  config = config.update(dreamerv3.configs['medium'])
+  config = config.update(dreamerv3.configs['xlarge'])
   config = config.update({
-      'logdir': '~/logdir/run1',
+      'logdir': '~/logdir/run_{}'.format(datetime.now().strftime('%Y%m%d-%H%M%S')),
       'run.train_ratio': 64,
       'run.log_every': 30,  # Seconds
       'batch_size': 16,
@@ -35,8 +36,9 @@ def main():
   from ssbuenv import UltimateEnv
   from embodied.envs import from_gym
   import os
-  with UltimateEnv(server_url=os.getenv("SERVER_ADDRESS"), fps=10, image_size=(64, 64)) as env:  # Replace this with your Gym env.
-    env = from_gym.FromGym(env, obs_key='image')  # Or obs_key='vector'.
+  obs_key = 'image'
+  with UltimateEnv(server_url=os.getenv("SERVER_ADDRESS"), obs_key=obs_key, fps=10, image_size=(64, 64)) as env:  # Replace this with your Gym env.
+    env = from_gym.FromGym(env, obs_key=obs_key)  # Or obs_key='vector'.
     env = dreamerv3.wrap_env(env, config)
     env = embodied.BatchEnv([env], parallel=False)
 

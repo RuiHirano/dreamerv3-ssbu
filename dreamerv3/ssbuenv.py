@@ -217,7 +217,7 @@ class UltimateEnv(gym.Env):
         return reward
 
 if __name__ == "__main__":
-    with UltimateEnv(server_url="http://35.77.44.214:8008", fps=10, obs_key="vector", image_size=(84, 84), disable_percent_reset=False) as env:
+    with UltimateEnv(server_url="http://localhost:8008", fps=10, obs_key="vector", image_size=(84, 84), disable_percent_reset=False) as env:
         episode = 1000
         for i in range(episode):
             print("episode: ", i)
